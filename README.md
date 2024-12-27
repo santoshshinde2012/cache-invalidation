@@ -21,7 +21,51 @@ chmod +x ./init/init-replica.sh
 docker-compose -f infra/docker-compose.yml up -d
 ```
 
+- Connect
+
+```
+curl --location 'localhost:8083/connectors' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "mongodb-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
+    "tasks.max": "1",
+    "mongodb.hosts": "rs0/mongodb:27017",
+    "mongodb.name": "mongodb",
+    "mongodb.user": "root",
+    "mongodb.password": "password1234",
+    "mongodb.database": "database",
+    "topic.prefix": "dbserver1",
+    "poll.interval.ms": "1000"
+  }
+}
+'
+
+// Response
+  
+{
+    "name": "mongodb-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
+        "tasks.max": "1",
+        "mongodb.hosts": "rs0/mongodb:27017",
+        "mongodb.name": "mongodb",
+        "mongodb.user": "root",
+        "mongodb.password": "password1234",
+        "mongodb.database": "database",
+        "topic.prefix": "dbserver1",
+        "poll.interval.ms": "1000",
+        "name": "mongodb-connector"
+    },
+    "tasks": [],
+    "type": "source"
+}
+```
+
+
 - Install the npm modules
+
 ```bash
 $ npm install
 ```
@@ -38,8 +82,6 @@ npm install --save @nestjs/config
 ```bash
 $ docker compose up
 ```
-
-
 
 ```bash
 # development

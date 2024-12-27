@@ -28,4 +28,8 @@ export class AppConfigService {
   get mongoUri(): string {
     return this.configService.get<string>('mongo.uri');
   }
+
+  get kafkaConsumerGroupIds(): string[] {
+    return this.configService.get<string[]>('kafka.groupIds');
+  }
 }

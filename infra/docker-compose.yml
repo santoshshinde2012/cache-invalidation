@@ -83,6 +83,29 @@ services:
     networks:
       - cdc-network
 
+  debezium-mongo:
+    image: debezium/connect:2.0
+    depends_on:
+      - kafka
+      - mongo
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: debezium-group
+      OFFSET_STORAGE: kafka
+      DATABASE_HOSTS: mongo:27017
+      DATABASE_USER: root
+      DATABASE_PASSWORD: rootpassword
+      DATABASE_NAME: database
+      DATABASE_INCLUDE_LIST: database
+      COLLECTION_INCLUDE_LIST: database.queries 
+      MONGODB_REPLICA_SET: rs0
+      CONFIG_STORAGE_TOPIC: _connect-configs
+      OFFSET_STORAGE_TOPIC: _connect-offsets
+    ports:
+      - '8083:8083'  
+    networks:
+      - cdc-network
+
 volumes:
   mongodb_data:
     driver: local
