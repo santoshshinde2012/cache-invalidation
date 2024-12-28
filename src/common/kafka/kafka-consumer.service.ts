@@ -43,7 +43,7 @@ export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
       await consumer.connect();
 
       await consumer.subscribe({
-        topic: 'dbserver1.database.queries',
+        topic: this.appConfigService.kafkaTopic,
         fromBeginning: true,
       });
 

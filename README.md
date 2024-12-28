@@ -90,6 +90,18 @@ curl --location 'localhost:8083/connectors/mongo-connector/status' \
 }
 ```
 
+- Create `.env` file
+
+```
+KAFKA_CLIENT_ID=my-kafka-client
+KAFKA_BROKERS=localhost:29092
+KAFKA_TOPIC=dbserver1.database.queries
+
+REDIS_HOST=localhost
+REDIS_PORT=6379
+MONGODB_URI=mongodb://root:rootpassword@localhost:27017/database?authSource=admin&replicaSet=rs0
+```
+
 - Install the npm modules
 
 ```bash
