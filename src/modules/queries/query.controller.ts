@@ -1,9 +1,25 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { QueryService } from './query.service';
+import { Query as QueryEntity } from './query.schema';
+import { UpdateQueryDto } from './dto/update-query.dto';
+import { GetQueriesDto } from './dto/get-queries.dto';
+import { RedisService } from 'src/common/redis/redis.service';
 
 @Controller('queries')
 export class QueryController {
-  constructor(private readonly queryService: QueryService) {}
+  constructor(
+    private readonly queryService: QueryService,
+    private readonly redisService: RedisService,
+  ) {}
 
   @Post()
   async createQuery(
@@ -12,29 +28,67 @@ export class QueryController {
     @Body('queryText') queryText: string,
     @Body('metadata') metadata?: Record<string, unknown>,
   ) {
-    return this.queryService.createQuery(
+    const newQuery = await this.queryService.createQuery(
       userEmail,
       moduleName,
       queryText,
       metadata,
     );
+
+    return newQuery;
   }
 
   @Get()
-  async getQueries(
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
-    @Query('moduleName') moduleName?: string,
-    @Query('userEmail') userEmail?: string,
-    @Query('status') status?: string,
-  ) {
-    const pageNumber = parseInt(page, 10) || 1;
-    const limitNumber = parseInt(limit, 10) || 10;
+  async getQueries(@Query() queryParams: GetQueriesDto): Promise<{
+    data: QueryEntity[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const { page = 1, limit = 10, moduleName, userEmail, status } = queryParams;
 
-    return this.queryService.getQueries(pageNumber, limitNumber, {
-      moduleName,
-      userEmail,
-      status,
-    });
+    const cacheKey = `queries_page${page}_limit${limit}_moduleName-${moduleName || 'all'}_userEmail-${userEmail || 'all'}_status-${status || 'all'}`;
+
+    const cachedData = await this.redisService.getResult(cacheKey);
+
+    if (cachedData) {
+      console.info('X-Cache', 'HIT');
+
+      return JSON.parse(cachedData);
+    }
+
+    console.info('X-Cache', 'MISS');
+
+    const data = await this.queryService.getQueries(
+      Number(page),
+      Number(limit),
+      {
+        moduleName,
+        userEmail,
+        status,
+      },
+    );
+
+    await this.redisService.setResult(cacheKey, data);
+
+    return data;
+  }
+
+  @Get(':id')
+  async getQuery(@Param('id') id: string): Promise<QueryEntity> {
+    return this.queryService.getQueryById(id);
+  }
+
+  @Put(':id')
+  async updateQuery(
+    @Param('id') id: string,
+    @Body() updateQueryDto: UpdateQueryDto,
+  ): Promise<QueryEntity> {
+    return this.queryService.updateQuery(id, updateQueryDto);
+  }
+
+  @Delete(':id')
+  async deleteQuery(@Param('id') id: string): Promise<void> {
+    return this.queryService.deleteQuery(id);
   }
 }

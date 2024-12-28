@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Query } from './query.schema';
+import { UpdateQueryDto } from './dto/update-query.dto';
 
 @Injectable()
 export class QueryService {
@@ -27,20 +28,48 @@ export class QueryService {
   async getQueries(
     page: number = 1,
     limit: number = 10,
-    filter: { moduleName?: string; userEmail?: string; status?: string } = {},
-  ): Promise<{ data: Query[]; total: number }> {
+    filters: { moduleName?: string; userEmail?: string; status?: string } = {},
+  ): Promise<{ data: Query[]; total: number; page: number; limit: number }> {
     const skip = (page - 1) * limit;
 
-    const queryFilter: Record<string, string> = {};
-    if (filter.moduleName) queryFilter.moduleName = filter.moduleName;
-    if (filter.userEmail) queryFilter.userEmail = filter.userEmail;
-    if (filter.status) queryFilter.status = filter.status;
+    const query: Record<string, any> = {};
+    if (filters.moduleName) query.moduleName = filters.moduleName;
+    if (filters.userEmail) query.userEmail = filters.userEmail;
+    if (filters.status) query.status = filters.status;
 
     const [data, total] = await Promise.all([
-      this.queryModel.find(queryFilter).skip(skip).limit(limit).exec(),
-      this.queryModel.countDocuments(queryFilter),
+      this.queryModel.find(query).skip(skip).limit(limit).exec(),
+      this.queryModel.countDocuments(query).exec(),
     ]);
 
-    return { data, total };
+    return { data, total, page, limit };
+  }
+
+  async getQueryById(id: string): Promise<Query> {
+    const query = await this.queryModel.findById(id).exec();
+    if (!query) {
+      throw new NotFoundException(`Query with ID ${id} not found`);
+    }
+    return query;
+  }
+
+  async updateQuery(
+    id: string,
+    updateQueryDto: UpdateQueryDto,
+  ): Promise<Query> {
+    const updatedQuery = await this.queryModel
+      .findByIdAndUpdate(id, updateQueryDto, { new: true })
+      .exec();
+    if (!updatedQuery) {
+      throw new NotFoundException(`Query with ID ${id} not found`);
+    }
+    return updatedQuery;
+  }
+
+  async deleteQuery(id: string): Promise<void> {
+    const query = await this.queryModel.findByIdAndDelete(id).exec();
+    if (!query) {
+      throw new NotFoundException(`Query with ID ${id} not found`);
+    }
   }
 }

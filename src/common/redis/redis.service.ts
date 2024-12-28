@@ -1,4 +1,3 @@
-// src/redis/redis.service.ts
 import { Injectable } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { AppConfigService } from '../../config/config.service';
@@ -14,11 +13,15 @@ export class RedisService {
     });
   }
 
-  async getResult(correlationId: string): Promise<string> {
-    return this.client.get(correlationId);
+  async getResult(key: string): Promise<string> {
+    return this.client.get(key);
   }
 
-  async setResult<T>(correlationId: string, result: T): Promise<void> {
-    await this.client.set(correlationId, JSON.stringify(result));
+  async setResult<T>(key: string, result: T): Promise<void> {
+    await this.client.set(key, JSON.stringify(result));
+  }
+
+  async clear(): Promise<void> {
+    await this.client.flushall();
   }
 }

@@ -88,6 +88,7 @@ export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
   }
   async handleCacheInvalidation<T>(op: string, after: T, before: T) {
     console.log('Cache Invalidation', op, after, before);
+    this.redisService.clear();
   }
 
   async onModuleDestroy() {
