@@ -9,7 +9,7 @@ export class AjvValidationPipe implements PipeTransform {
     this.ajv = new Ajv({ allErrors: true });
   }
 
-  transform(value: any) {
+  transform(value: unknown) {
     const validate = this.ajv.compile(this.schema);
     const valid = validate(value);
 

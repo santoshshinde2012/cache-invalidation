@@ -13,7 +13,7 @@ export class QueryService {
     userEmail: string,
     moduleName: string,
     queryText: string,
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): Promise<Query> {
     const newQuery = new this.queryModel({
       userEmail,
@@ -31,7 +31,7 @@ export class QueryService {
   ): Promise<{ data: Query[]; total: number }> {
     const skip = (page - 1) * limit;
 
-    const queryFilter: Record<string, any> = {};
+    const queryFilter: Record<string, string> = {};
     if (filter.moduleName) queryFilter.moduleName = filter.moduleName;
     if (filter.userEmail) queryFilter.userEmail = filter.userEmail;
     if (filter.status) queryFilter.status = filter.status;

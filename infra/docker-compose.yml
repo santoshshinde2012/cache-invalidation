@@ -90,17 +90,14 @@ services:
       - mongo
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
-      GROUP_ID: debezium-group
-      OFFSET_STORAGE: kafka
-      DATABASE_HOSTS: mongo:27017
-      DATABASE_USER: root
-      DATABASE_PASSWORD: rootpassword
-      DATABASE_NAME: database
-      DATABASE_INCLUDE_LIST: database
-      COLLECTION_INCLUDE_LIST: database.queries 
-      MONGODB_REPLICA_SET: rs0
-      CONFIG_STORAGE_TOPIC: _connect-configs
-      OFFSET_STORAGE_TOPIC: _connect-offsets
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: debezium_config
+      OFFSET_STORAGE_TOPIC: debezium_offset
+      STATUS_STORAGE_TOPIC: debezium_status
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: false
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: false
     ports:
       - '8083:8083'  
     networks:

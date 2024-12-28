@@ -16,7 +16,7 @@ export class Query extends Document {
   status?: string;
 
   @Prop({ type: Object, default: {} })
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export const QuerySchema = SchemaFactory.createForClass(Query);

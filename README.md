@@ -27,16 +27,15 @@ docker-compose -f infra/docker-compose.yml up -d
 curl --location 'localhost:8083/connectors' \
 --header 'Content-Type: application/json' \
 --data '{
-  "name": "mongodb-connector",
+  "name": "mongo-connector",
   "config": {
     "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
     "tasks.max": "1",
     "mongodb.hosts": "rs0/mongodb:27017",
-    "mongodb.name": "mongodb",
-    "mongodb.user": "root",
+    "mongodb.user": "root", 
     "mongodb.password": "password1234",
     "mongodb.database": "database",
-    "topic.prefix": "dbserver1",
+    "topic.prefix": "mongo",
     "poll.interval.ms": "1000"
   }
 }
@@ -45,18 +44,17 @@ curl --location 'localhost:8083/connectors' \
 // Response
   
 {
-    "name": "mongodb-connector",
+    "name": "mongo-connector",
     "config": {
         "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
         "tasks.max": "1",
         "mongodb.hosts": "rs0/mongodb:27017",
-        "mongodb.name": "mongodb",
         "mongodb.user": "root",
         "mongodb.password": "password1234",
         "mongodb.database": "database",
-        "topic.prefix": "dbserver1",
+        "topic.prefix": "mongo",
         "poll.interval.ms": "1000",
-        "name": "mongodb-connector"
+        "name": "mongo-connector"
     },
     "tasks": [],
     "type": "source"
@@ -125,6 +123,7 @@ With Mau, you can deploy your application in just a few clicks, allowing you to 
 Check out a few resources that may come in handy when working with NestJS:
 
 - Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- [Debezium connector for MongoDB](https://docs.redhat.com/en/documentation/red_hat_build_of_debezium/2.3.4/html/debezium_user_guide/debezium-connector-for-mongodb#debezium-mongodb-triggering-an-incremental-snapshot)
 
 ## Stay in touch
 

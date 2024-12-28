@@ -14,11 +14,11 @@ export class RedisService {
     });
   }
 
-  async getResult(correlationId: string): Promise<any> {
+  async getResult(correlationId: string): Promise<string> {
     return this.client.get(correlationId);
   }
 
-  async setResult(correlationId: string, result: any): Promise<void> {
+  async setResult<T>(correlationId: string, result: T): Promise<void> {
     await this.client.set(correlationId, JSON.stringify(result));
   }
 }

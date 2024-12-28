@@ -10,7 +10,7 @@ export class QueryController {
     @Body('userEmail') userEmail: string,
     @Body('moduleName') moduleName: string,
     @Body('queryText') queryText: string,
-    @Body('metadata') metadata?: Record<string, any>,
+    @Body('metadata') metadata?: Record<string, unknown>,
   ) {
     return this.queryService.createQuery(
       userEmail,
