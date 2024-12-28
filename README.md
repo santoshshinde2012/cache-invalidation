@@ -21,46 +21,74 @@ chmod +x ./init/init-replica.sh
 docker-compose -f infra/docker-compose.yml up -d
 ```
 
-- Connect
+- Debzium Connector Config
 
 ```
 curl --location 'localhost:8083/connectors' \
 --header 'Content-Type: application/json' \
 --data '{
-  "name": "mongo-connector",
-  "config": {
-    "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
-    "tasks.max": "1",
-    "mongodb.hosts": "rs0/mongodb:27017",
-    "mongodb.user": "root", 
-    "mongodb.password": "password1234",
-    "mongodb.database": "database",
-    "topic.prefix": "mongo",
-    "poll.interval.ms": "1000"
-  }
+    "name": "mongo-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
+        "mongodb.hosts": "rs0/mongo:27017",
+        "mongodb.name": "dbserver1",
+        "mongodb.user": "root",
+        "mongodb.password": "rootpassword",
+        "database.include.list": "database",
+        "collection.include.list": "database.queries",
+        "tasks.max": "1",
+        "topic.prefix": "dbserver1"
+    }
 }
 '
 
 // Response
-  
+
 {
     "name": "mongo-connector",
     "config": {
         "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
-        "tasks.max": "1",
-        "mongodb.hosts": "rs0/mongodb:27017",
+        "mongodb.hosts": "rs0/mongo:27017",
+        "mongodb.name": "dbserver1",
         "mongodb.user": "root",
-        "mongodb.password": "password1234",
-        "mongodb.database": "database",
-        "topic.prefix": "mongo",
-        "poll.interval.ms": "1000",
-        "name": "mongo-connector"
+        "mongodb.password": "rootpassword",
+        "database.include.list": "database",
+        "collection.include.list": "database.queries",
+        "tasks.max": "1",
+        "topic.prefix": "dbserver1",
+        "name": "mongo-connector1"
     },
     "tasks": [],
     "type": "source"
 }
 ```
 
+- Debzium Connector Config Status
+
+```
+// Request
+
+curl --location 'localhost:8083/connectors/mongo-connector/status' \
+--data ''
+
+// Response
+
+{
+    "name": "mongo-connector",
+    "connector": {
+        "state": "RUNNING",
+        "worker_id": "172.18.0.8:8083"
+    },
+    "tasks": [
+        {
+            "id": 0,
+            "state": "RUNNING",
+            "worker_id": "172.18.0.8:8083"
+        }
+    ],
+    "type": "source"
+}
+```
 
 - Install the npm modules
 
@@ -108,15 +136,6 @@ $ npm run test:cov
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
 ## Resources
 
