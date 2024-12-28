@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { RedisService } from '../redis/redis.service';
-import { AppConfigService } from '../config/config.service';
+import { AppConfigService } from '../../config/config.service';
 
 @Injectable()
 export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AppConfigService } from '../config/config.service';
+import { AppConfigService } from '../../config/config.service';
 import { MongoService } from './mongo.service';
 import { ConfigAppModule } from 'src/config/config.module';
 

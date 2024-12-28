@@ -1,7 +1,7 @@
 // src/redis/redis.service.ts
 import { Injectable } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import { AppConfigService } from '../config/config.service';
+import { AppConfigService } from '../../config/config.service';
 
 @Injectable()
 export class RedisService {
