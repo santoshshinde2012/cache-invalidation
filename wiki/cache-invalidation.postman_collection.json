@@ -1,0 +1,339 @@
+{
+	"info": {
+		"_postman_id": "d316e2c5-e777-4baa-9b4a-eddc29cc0c8c",
+		"name": "cache-invalidation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10883620"
+	},
+	"item": [
+		{
+			"name": "setup",
+			"item": [
+				{
+					"name": "create-connector",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"mongodb-connector\",\n  \"config\": {\n    \"connector.class\": \"io.debezium.connector.mongodb.MongoDbConnector\",\n    \n    // MongoDB Connection Details\n    \"mongodb.hosts\": \"rs0/mongo:27017\", // Replace with your MongoDB hosts\n    \"mongodb.name\": \"dbserver1\", // Logical name for the MongoDB server\n    \n    // Authentication\n    \"mongodb.user\": \"root\",\n    \"mongodb.password\": \"rootpassword\",\n    \"mongodb.authsource\": \"admin\",\n    \n    // Capture Mode - This setting ensures you capture both before and after states for updates\n    \"capture.mode\": \"change_streams_update_full_with_pre_image\",\n    \n    // Collections to Monitor\n    \"database.include.list\": \"database\", // Adjust according to your needs\n    \"collection.include.list\": \"database.queries\", // Adjust according to your needs\n    \n    // Number of Tasks\n    \"tasks.max\": \"3\", // Adjust based on your resources and requirements\n    \n    // Kafka Topic Naming\n    \"topic.prefix\": \"dbserver1\", // Prefix for Kafka topics\n    \n    // Schema and Event Handling\n    \"output.schema\": \"true\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": \"false\",\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter.schemas.enable\": \"false\",\n    \n    // Performance Tuning\n    \"snapshot.mode\": \"initial\", // Perform an initial snapshot when starting up\n    \"snapshot.max.threads\": \"4\", // Number of threads for snapshotting\n    \n    // Transaction Metadata\n    \"provide.transaction.metadata\": \"true\",\n    \n    // Error Handling\n    \"errors.retry.timeout\": \"0\", // No retry on failures, for production you might want to adjust this\n    \"errors.tolerance\": \"none\", // Tolerance for errors\n    \n    // Heartbeat for Monitoring\n    \"heartbeat.interval.ms\": \"30000\", // Every 30 seconds\n    \n    // Miscellaneous\n    \"max.queue.size\": \"8192\", // Maximum number of records that can be buffered in memory\n    \"max.batch.size\": \"2048\",\n    \"poll.interval.ms\": \"1000\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/connectors",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"connectors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "connector-status",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/connectors/mongodb-connector/status",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"connectors",
+								"mongodb-connector",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "connector-details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/connectors/mongodb-connector",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"connectors",
+								"mongodb-connector"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "connectors-list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/connectors",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"connectors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "connectors",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8083/connectors",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"connectors"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "queries create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userEmail\": \"user@example.com\",\n  \"moduleName\": \"prediction\",\n  \"queryText\": \"What will be today's temperature?\",\n  \"metadata\": {\n    \"priority\": \"high\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/queries",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"queries"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "queries get all",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"demo\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/queries?page=2&limit=2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"queries"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						},
+						{
+							"key": "limit",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "query by id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/queries/6770087a222a25887687e4d5",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"queries",
+						"6770087a222a25887687e4d5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/queries/6773a368949f0338c8f7536b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"queries",
+						"6773a368949f0338c8f7536b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update query by id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userEmail\": \"user2@example.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/queries/6773a368949f0338c8f7536b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"queries",
+						"6773a368949f0338c8f7536b"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
