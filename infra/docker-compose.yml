@@ -9,6 +9,7 @@ services:
 
     networks:
       - cdc-network
+    restart: always
 
   kafka:
     image: confluentinc/cp-kafka:7.5.2
@@ -26,6 +27,7 @@ services:
 
     networks:
       - cdc-network
+    restart: always
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -40,6 +42,7 @@ services:
 
     networks:
       - cdc-network
+    restart: always
 
   redis:
     image: redis:latest
@@ -98,10 +101,24 @@ services:
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: false
       CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: false
+      REST_PORT: 8083
     ports:
       - '8083:8083'  
     networks:
       - cdc-network
+    restart: always
+
+  debezium-ui:
+    image: quay.io/debezium/debezium-ui:2.1
+    depends_on:
+      - debezium-mongo
+    ports:
+      - '8084:8080'
+    environment:
+      - KAFKA_CONNECT_URIS=http://debezium-mongo:8083
+    networks:
+      - cdc-network
+    restart: always
 
 volumes:
   mongodb_data:
