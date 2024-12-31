@@ -3,6 +3,7 @@ import {
   Post,
   Body,
   Get,
+  Res,
   Param,
   Put,
   Delete,
@@ -13,6 +14,7 @@ import { Query as QueryEntity } from './query.schema';
 import { UpdateQueryDto } from './dto/update-query.dto';
 import { GetQueriesDto } from './dto/get-queries.dto';
 import { RedisService } from 'src/common/redis/redis.service';
+import { Response } from 'express';
 
 @Controller('queries')
 export class QueryController {
@@ -39,25 +41,22 @@ export class QueryController {
   }
 
   @Get()
-  async getQueries(@Query() queryParams: GetQueriesDto): Promise<{
-    data: QueryEntity[];
-    total: number;
-    page: number;
-    limit: number;
-  }> {
+  async getQueries(
+    @Query() queryParams: GetQueriesDto,
+    @Res() res: Response,
+  ): Promise<void> {
     const { page = 1, limit = 10, moduleName, userEmail, status } = queryParams;
 
-    const cacheKey = `queries_page${page}_limit${limit}_moduleName-${moduleName || 'all'}_userEmail-${userEmail || 'all'}_status-${status || 'all'}`;
-
+    const cacheKey = `queries:page:${page}:limit:${limit}:module:${moduleName || 'all'}:user:${userEmail || 'all'}:status:${status || 'all'}`;
     const cachedData = await this.redisService.getResult(cacheKey);
 
     if (cachedData) {
-      console.info('X-Cache', 'HIT');
-
-      return JSON.parse(cachedData);
+      res.setHeader('X-Cache', 'HIT');
+      res.status(200).json(JSON.parse(cachedData));
+      return;
     }
 
-    console.info('X-Cache', 'MISS');
+    res.setHeader('X-Cache', 'MISS');
 
     const data = await this.queryService.getQueries(
       Number(page),
@@ -71,7 +70,7 @@ export class QueryController {
 
     await this.redisService.setResult(cacheKey, data);
 
-    return data;
+    res.status(200).json(data);
   }
 
   @Get(':id')

@@ -29,34 +29,90 @@ curl --location 'localhost:8083/connectors' \
 --data '{
     "name": "mongo-connector",
     "config": {
-        "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
-        "mongodb.hosts": "rs0/mongo:27017",
-        "mongodb.name": "dbserver1",
-        "mongodb.user": "root",
-        "mongodb.password": "rootpassword",
-        "database.include.list": "database",
-        "collection.include.list": "database.queries",
-        "tasks.max": "1",
-        "topic.prefix": "dbserver1"
-    }
+      "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
+      
+      // MongoDB Connection Details
+      "mongodb.hosts": "rs0/mongo:27017", // Replace with your MongoDB hosts
+      "mongodb.name": "dbserver1", // Logical name for the MongoDB server
+      
+      // Authentication
+      "mongodb.user": "root",
+      "mongodb.password": "rootpassword",
+      "mongodb.authsource": "admin",
+      
+      // Capture Mode - This setting ensures you capture both before and after states for updates
+      "capture.mode": "change_streams_update_full_with_pre_image",
+      
+      // Collections to Monitor
+      "database.include.list": "database", // Adjust according to your needs
+      "collection.include.list": "database.queries", // Adjust according to your needs
+      
+      // Number of Tasks
+      "tasks.max": "3", // Adjust based on your resources and requirements
+      
+      // Kafka Topic Naming
+      "topic.prefix": "dbserver1", // Prefix for Kafka topics
+      
+      // Schema and Event Handling
+      "output.schema": "true",
+      "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+      "key.converter.schemas.enable": "false",
+      "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+      "value.converter.schemas.enable": "false",
+      
+      // Performance Tuning
+      "snapshot.mode": "initial", // Perform an initial snapshot when starting up
+      "snapshot.max.threads": "4", // Number of threads for snapshotting
+      
+      // Transaction Metadata
+      "provide.transaction.metadata": "true",
+      
+      // Error Handling
+      "errors.retry.timeout": "0", // No retry on failures, for production you might want to adjust this
+      "errors.tolerance": "none", // Tolerance for errors
+      
+      // Heartbeat for Monitoring
+      "heartbeat.interval.ms": "30000", // Every 30 seconds
+      
+      // Miscellaneous
+      "max.queue.size": "8192", // Maximum number of records that can be buffered in memory
+      "max.batch.size": "2048",
+      "poll.interval.ms": "1000"
+  }
 }
 '
 
 // Response
 
 {
-    "name": "mongo-connector",
+    "name": "mongodb-connector",
     "config": {
         "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
         "mongodb.hosts": "rs0/mongo:27017",
         "mongodb.name": "dbserver1",
         "mongodb.user": "root",
         "mongodb.password": "rootpassword",
+        "mongodb.authsource": "admin",
+        "capture.mode": "change_streams_update_full_with_pre_image",
         "database.include.list": "database",
         "collection.include.list": "database.queries",
-        "tasks.max": "1",
+        "tasks.max": "3",
         "topic.prefix": "dbserver1",
-        "name": "mongo-connector1"
+        "output.schema": "true",
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": "false",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": "false",
+        "snapshot.mode": "initial",
+        "snapshot.max.threads": "4",
+        "provide.transaction.metadata": "true",
+        "errors.retry.timeout": "0",
+        "errors.tolerance": "none",
+        "heartbeat.interval.ms": "30000",
+        "max.queue.size": "8192",
+        "max.batch.size": "2048",
+        "poll.interval.ms": "1000",
+        "name": "mongodb-connector1"
     },
     "tasks": [],
     "type": "source"
@@ -74,16 +130,16 @@ curl --location 'localhost:8083/connectors/mongo-connector/status' \
 // Response
 
 {
-    "name": "mongo-connector",
+    "name": "mongodb-connector",
     "connector": {
         "state": "RUNNING",
-        "worker_id": "172.18.0.8:8083"
+        "worker_id": "172.18.0.7:8083"
     },
     "tasks": [
         {
             "id": 0,
             "state": "RUNNING",
-            "worker_id": "172.18.0.8:8083"
+            "worker_id": "172.18.0.7:8083"
         }
     ],
     "type": "source"

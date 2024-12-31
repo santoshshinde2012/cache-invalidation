@@ -21,6 +21,13 @@ export class RedisService {
     await this.client.set(key, JSON.stringify(result));
   }
 
+  async deleteKeysByPattern(pattern: string): Promise<void> {
+    const keys = await this.client.keys(pattern);
+    if (keys.length) {
+      await this.client.del(keys);
+    }
+  }
+
   async clear(): Promise<void> {
     await this.client.flushall();
   }

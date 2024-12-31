@@ -12,8 +12,8 @@ echo ====================================================
 
 # Loop until MongoDB is ready to accept connections
 until mongosh --host mongo:27017 --eval 'quit(0)' &>/dev/null; do
-    echo "Waiting for mongod to start..."
-    sleep 5
+  echo "Waiting for mongod to start..."
+  sleep 5
 done
 
 echo "MongoDB started. Initiating Replica Set..."
@@ -26,8 +26,30 @@ rs.initiate({
     { _id: 0, host: "localhost:27017" }
   ]
 })
+
+while (!rs.isMaster().ismaster) {
+  sleep(1000); // Wait for 1 second before checking again
+}
+
+print("Replica set initialized.");
+
+use database;
+
+// Check if the collection already exists
+
+if (db.getCollectionNames().includes("queries")) {
+  print("Collection 'queries' already exists. Modifying its options...");
+  db.runCommand({
+    collMod: "queries",
+    changeStreamPreAndPostImages: { enabled: true }
+  });
+} else {
+  print("Collection 'queries' does not exist. Creating it...");
+  db.createCollection("queries", {
+    changeStreamPreAndPostImages: { enabled: true }
+  });
+}
+
 EOF
 
-echo ====================================================
-echo ============= Replica Set initialized ==============
-echo ====================================================
+echo "Replica Set initialized and pre-images enabled."

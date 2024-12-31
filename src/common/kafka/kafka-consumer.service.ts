@@ -72,6 +72,7 @@ export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
 
     try {
       const { op, after, before } = JSON.parse(message.value.toString());
+      console.info(`message - ${message.value.toString()}`);
       switch (op) {
         case 'c':
         case 'u':
@@ -87,8 +88,9 @@ export class KafkaConsumerService implements OnModuleInit, OnModuleDestroy {
     }
   }
   async handleCacheInvalidation<T>(op: string, after: T, before: T) {
-    console.log('Cache Invalidation', op, after, before);
-    this.redisService.clear();
+    console.info('Cache Invalidation', op, after, before);
+    const pattern = 'queries:*';
+    await this.redisService.deleteKeysByPattern(pattern);
   }
 
   async onModuleDestroy() {
